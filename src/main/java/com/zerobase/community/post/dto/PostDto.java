@@ -1,5 +1,6 @@
 package com.zerobase.community.post.dto;
 
+import com.zerobase.community.file.dto.FileDto;
 import com.zerobase.community.post.entity.Post;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @Data
 public class PostDto {
+
 	private Long postId;
 	private String title;
 	private String contents;
@@ -26,6 +28,9 @@ public class PostDto {
 	long totalCount;
 	long seq;
 
+	// 파일
+	List<FileDto> files;
+
 	public static PostDto of(Post post) {
 		return PostDto.builder()
 			.postId(post.getPostId())
@@ -37,12 +42,12 @@ public class PostDto {
 			.build();
 	}
 
-	public static List<PostDto> of (List<Post> posts) {
+	public static List<PostDto> of(List<Post> posts) {
 		if (posts == null) {
 			return null;
 		}
 		List<PostDto> postList = new ArrayList<>();
-		for(Post x : posts) {
+		for (Post x : posts) {
 			postList.add(PostDto.of(x));
 		}
 		return postList;

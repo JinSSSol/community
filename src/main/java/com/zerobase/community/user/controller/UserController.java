@@ -4,6 +4,7 @@ package com.zerobase.community.user.controller;
 import com.zerobase.community.user.model.UserInput;
 import com.zerobase.community.user.service.UserService;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -17,11 +18,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public class UserController {
 
 	private final UserService userService;
+
 	@Value("${adminCode}")
 	private String adminCode;
 
 	@RequestMapping("/")
-	String index(Model model) {
+	String index() {
 
 		return "index";
 	}
@@ -54,13 +56,11 @@ public class UserController {
 
 	@RequestMapping(value = {"/user/register", "/user/register_admin"}, method = RequestMethod.POST)
 	public String registerSubmit(Model model, HttpServletRequest request
-		, UserInput parameter) {
+		,@Valid UserInput parameter) {
 
 		boolean result = userService.register(parameter);
 		model.addAttribute("result", result);
 
 		return "user/register_complete";
 	}
-
-
 }

@@ -58,13 +58,9 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public UserDetails loadUserByUsername(String userEmail) throws UsernameNotFoundException {
-		Optional<User> optionalUser = userRepository.findByUserEmail(userEmail);
 
-		if (!optionalUser.isPresent()) {
-			throw new UsernameNotFoundException("회원 정보가 존재하지 않습니다.");
-		}
-
-		User user = optionalUser.get();
+		User user = userRepository.findByUserEmail(userEmail)
+			.orElseThrow(() -> new UsernameNotFoundException("회원 정보가 존재하지 않습니다."));
 
 		List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
 		grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_USER"));
