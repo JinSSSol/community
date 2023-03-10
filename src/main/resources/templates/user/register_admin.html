@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>회원 가입</title>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+          integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+          crossorigin="anonymous"></script>
+  <script th:inline="javascript">
+    /*<![CDATA[*/
+    $(document).ready(function () {
+
+      $('.adminAuth button').on('click', function () {
+
+        var adminCodeInput = $(this).closest('div').find('input[name=adminCodeInput]').val();
+        var adminCode = [[${adminCode}]];
+        ;
+
+        if (adminCodeInput !== adminCode) {
+          alert('관리자 인증에 실패하였습니다.');
+          return false;
+        }
+
+        $("input[name='adminAuthStatus']").val('success');
+        alert('관리자 인증에 성공하였습니다.')
+      });
+
+      $('#submitForm').on('submit', function () {
+        var $thisForm = $(this);
+
+        var adminAuthStatus = $thisForm.find('input[name=adminAuthStatus').val();
+        if (adminAuthStatus !== 'success') {
+          alert('관리자 인증이 필요합니다.');
+          return false;
+        }
+
+      });
+
+    });
+    /*]]>*/
+  </script>
+
+
+</head>
+<body>
+
+<h1>관리자 회원 가입</h1>
+
+
+<form id="submitForm" method="post">
+  <div>
+    <input type="email" name="userEmail" placeholder="이메일 입력" required/>
+  </div>
+
+  <div>
+    <input type="password" name="userPassword" placeholder="비밀번호 입력" required/>
+  </div>
+  <div>
+    <input type="password" name="rePassword" placeholder="비밀번호 입력 확인" required/>
+  </div>
+
+  <div>
+    <input type="text" name="userName" placeholder="이름 입력" required/>
+  </div>
+
+  <div>
+    <input type="date" name="userBirth" placeholder="생년월일 입력" required/>
+  </div>
+
+  <div class="adminAuth">
+    <input type="password" name="adminCodeInput" placeholder="관리자 코드 입력" required/>
+    <button type="button" value="false">관리자 인증</button>
+    <input type="hidden" name="adminAuthStatus"/>
+
+  </div>
+
+  <div>
+    <button type="submit">회원 가입</button>
+  </div>
+
+</form>
+
+</body>
+</html>

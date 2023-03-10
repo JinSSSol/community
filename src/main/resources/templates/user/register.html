@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>회원 가입</title>
+</head>
+<body>
+
+  <h1>회원 가입</h1>
+
+
+<form method="post">
+
+  <div>
+    <input type="email" name="userEmail" placeholder="이메일 입력" required/>
+  </div>
+
+  <div>
+    <input type="password" name="userPassword" placeholder="비밀번호 입력" required/>
+  </div>
+  <div>
+    <input type="password" name="rePassword" placeholder="비밀번호 입력 확인" required/>
+  </div>
+
+  <div>
+    <input type="text" name="userName" placeholder="이름 입력" required/>
+  </div>
+
+  <div>
+    <input type="date" name="userBirth" placeholder="생년월일 입력" required/>
+  </div>
+  <div>
+    <input type="hidden" name="adminAuthStatus"/>
+  </div>
+
+  <div>
+    <button type="submit">회원 가입</button>
+  </div>
+
+</form>
+
+</body>
+</html>
