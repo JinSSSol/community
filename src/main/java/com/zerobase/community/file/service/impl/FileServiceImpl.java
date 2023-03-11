@@ -1,9 +1,11 @@
 package com.zerobase.community.file.service.impl;
 
+import com.zerobase.community.file.dto.FileDto;
 import com.zerobase.community.file.entity.File;
 import com.zerobase.community.file.repository.FileRepository;
 import com.zerobase.community.file.service.FileService;
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,4 +49,25 @@ public class FileServiceImpl implements FileService {
 
 		return savedFile.getFileId();
 	}
+
+	@Override
+	public boolean delete(Long fileId) {
+		fileRepository.deleteById(fileId);
+		return true;
+	}
+
+	@Override
+	public FileDto getById(Long fileId) {
+		File file = fileRepository.findById(fileId).orElse(null);
+		return FileDto.of(file);
+	}
+
+	@Override
+	public List<FileDto> getByPostId(Long postId) {
+		List<File> files = fileRepository.findAllByPostId(postId)
+			.orElse(null);
+		return FileDto.of(files);
+	}
+
+
 }
