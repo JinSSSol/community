@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title> 게시글 수정 </title>
+  <style>
+    .detail table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .detail table th, .detail table td {
+      border: solid 1px #000;
+    }
+
+    .buttons {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .buttons a, .buttons button {
+      border-width: 0;
+      background-color: transparent;
+      text-decoration: underline;
+      font-size: 14px;
+      line-height: 20px;
+      height: 20px;
+      color: #000;
+      cursor: pointer;
+    }
+
+    label {
+      padding: 3px 20px;
+      background-color: #655a54;
+      border-radius: 4px;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+          integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+          crossorigin="anonymous"></script>
+  <script>
+    $(document).ready(function () {
+
+      $('#submitForm').on('submit', function () {
+
+        // 에디터의 내용이 textarea에 적용된다.
+        oEditors.getById["contents"].exec("UPDATE_CONTENTS_FIELD", []);
+
+      });
+
+
+      $('#deleteButton').on('click', function () {
+
+        if (!confirm(' 선택한 파일을 삭제하시겠습니까? ')) {
+          return false;
+        }
+
+        var fileId = $(this).val();
+
+        var $deleteForm = $('form[name=deleteForm]');
+        $deleteForm.find('input[name=fileId]').val(fileId);
+        $deleteForm.submit();
+      });
+
+    });
+  </script>
+
+</head>
+<body>
+<div th:replace="/fragments/layout.html :: fragment-body-menu"></div>
+<h1>게시글 수정</h1>
+
+<div class="detail">
+  <form id="submitForm" method="post" enctype="multipart/form-data">
+
+    <table>
+      <tbody>
+      <tr>
+        <th>
+          제목
+        </th>
+        <td>
+          <input type="text" name="title" th:value="${detail.title}" />
+        </td>
+      </tr>
+
+      <tr>
+        <th>
+          내용
+        </th>
+        <td>
+          <textarea id="contents" name="contents" th:text="${detail.contents}"></textarea>
+        </td>
+      </tr>
+      <tr>
+        <th>첨부 파일</th>
+        <td>
+          <label for="appendFile">
+            파일 추가
+          </label>
+          <input type="file" id="appendFile" multiple="multiple"  name="files" style="display:none" />
+
+          <div th:each="imageFile : ${detail.files}">
+            <img th:src="|/images/${imageFile.fileId}|" width="150" height="150">
+            <p th:text="${imageFile.originName}">이미지</p>
+            <button id = "deleteButton" th:value="${imageFile.fileId}" type="button">삭제</button>
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+
+    <div class="buttons">
+      <button type="submit"> 게시물 수정</button>
+      <a href="/user/post/list"> 목록 이동 </a>
+    </div>
+
+  </form>
+</div>
+
+<form name="deleteForm" method="post" action="/file/delete">
+  <input type="hidden" name="fileId"/>
+</form>
+
+
+<script type="text/javascript" src="/res/se2/js/service/HuskyEZCreator.js" charset="utf-8"></script>
+<script type="text/javascript">
+
+  var oEditors = [];
+
+  setTimeout(function () {
+
+    nhn.husky.EZCreator.createInIFrame({
+      oAppRef: oEditors,
+      elPlaceHolder: "contents",
+      sSkinURI: "/res/se2/SmartEditor2Skin.html",
+      fCreator: "createSEditor2"
+    });
+
+  }, 100);
+
+</script>
+</body>
+</html>

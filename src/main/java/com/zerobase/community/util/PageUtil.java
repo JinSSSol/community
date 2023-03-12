@@ -42,6 +42,13 @@ public class PageUtil {
 	 */
 	private String queryString;
 
+
+	public PageUtil(long totalCount, long pageIndex, String queryString) {
+		this.totalCount = totalCount;
+		this.pageIndex = pageIndex;
+		this.queryString = queryString;
+	}
+
 	public PageUtil(long totalCount, long pageSize, long pageIndex, String queryString) {
 		this.totalCount = totalCount;
 		this.pageSize = pageSize;

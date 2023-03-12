@@ -1,6 +1,7 @@
 package com.zerobase.community.post.controller;
 
 
+import com.zerobase.community.common.model.PagingResponse;
 import com.zerobase.community.file.dto.FileDto;
 import com.zerobase.community.file.model.FileInput;
 import com.zerobase.community.file.service.FileService;
@@ -10,7 +11,7 @@ import com.zerobase.community.post.model.PostParam;
 import com.zerobase.community.post.service.PostService;
 import java.io.IOException;
 import java.security.Principal;
-import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @RequiredArgsConstructor
 @Controller
-public class PostController extends BaseController {
+public class PostController {
 
 	private final PostService postService;
 	private final FileService fileService;
@@ -48,15 +49,11 @@ public class PostController extends BaseController {
 	@GetMapping("/post/list")
 	public String list(Model model, @Valid PostParam parameter) {
 		parameter.init();
-		List<PostDto> posts = postService.list(parameter);
+		PagingResponse<PostDto> posts = postService.list(parameter);
 
-		long totalCount = posts != null && posts.size() > 0 ? posts.get(0).getTotalCount() : 0;
-		String pagerHtml = getPaperHtml(totalCount, parameter.getPageSize(),
-			parameter.getPageIndex(), parameter.getQueryString());
-
-		model.addAttribute("list", posts);
-		model.addAttribute("totalCount", totalCount);
-		model.addAttribute("pager", pagerHtml);
+		model.addAttribute("list", posts.getList());
+		model.addAttribute("totalCount", posts.getTotalCount());
+		model.addAttribute("pager", posts.getPager());
 
 		return "post/list";
 	}
@@ -72,7 +69,7 @@ public class PostController extends BaseController {
 	//   이미지 출력
 	@GetMapping("/images/{fileId}")
 	@ResponseBody
-	public Resource loadImage(@PathVariable("fileId") @NotBlank  Long fileId) throws IOException {
+	public Resource loadImage(@PathVariable("fileId") @NotBlank Long fileId) throws IOException {
 		FileDto file = fileService.getById(fileId);
 		return new UrlResource("file:" + file.getSavedPath());
 	}
@@ -84,9 +81,11 @@ public class PostController extends BaseController {
 	}
 
 	@PostMapping("/file/delete")
-	public String deleteFile(@Valid FileInput parameter) {
+	public String deleteFile(HttpServletRequest request, FileInput parameter) {
+
 		boolean result = fileService.delete(parameter.getFileId());
-		return "redirect:/user/post/list";
+
+		return "redirect:" + request.getHeader("Referer");
 	}
 
 
