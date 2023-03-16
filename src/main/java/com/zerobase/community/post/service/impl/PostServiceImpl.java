@@ -79,12 +79,10 @@ public class PostServiceImpl implements PostService {
 	}
 
 	@Override
-	public PagingResponse<PostDto> myPost(String userEmail) {
-		User user = userRepository.findByUserEmail(userEmail)
-			.orElseThrow(() -> new IllegalArgumentException("User doesn't exist"));
+	public PagingResponse<PostDto> myPost(Long userId) {
 
 		PostParam parameter = new PostParam();
-		parameter.setUserId(user.getUserId());
+		parameter.setUserId(userId);
 
 		parameter.init();
 		long totalCount = userPostMapper.selectMyPostListCount(parameter);
@@ -93,6 +91,14 @@ public class PostServiceImpl implements PostService {
 		String pager = postPager(list, parameter, totalCount);
 
 		return new PagingResponse<>(list, pager, totalCount);
+	}
+
+	@Override
+	public PagingResponse<PostDto> myPostByEmail(String userEmail) {
+		User user = userRepository.findByUserEmail(userEmail)
+			.orElseThrow(() -> new IllegalArgumentException("User doesn't exist"));
+
+		return this.myPost(user.getUserId());
 	}
 
 

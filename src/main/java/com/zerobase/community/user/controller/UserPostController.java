@@ -30,7 +30,7 @@ public class UserPostController {
 	public String userManagePost(Model model, Principal principal) {
 
 		String userEmail = principal.getName();
-		PagingResponse<PostDto> myPosts = postService.myPost(userEmail);
+		PagingResponse<PostDto> myPosts = postService.myPostByEmail(userEmail);
 
 		model.addAttribute("list", myPosts.getList());
 		model.addAttribute("totalCount", myPosts.getTotalCount());

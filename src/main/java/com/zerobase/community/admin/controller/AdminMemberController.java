@@ -24,7 +24,7 @@ public class AdminMemberController {
 	private final AdminService adminService;
 	private final UserService userService;
 
-	@GetMapping("list")
+	@GetMapping()
 	public String userList(Model model, @Valid UserParam parameter) {
 
 		PagingResponse<UserDto> users = userService.list(parameter);

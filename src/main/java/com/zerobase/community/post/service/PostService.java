@@ -27,7 +27,12 @@ public interface PostService {
 	/**
 	 * 내 게시글 목록
 	 */
-	PagingResponse<PostDto> myPost(String userEmail);
+	PagingResponse<PostDto> myPost(Long userId);
+
+	/**
+	 * 내 게시글 목록 By Email
+	 */
+	PagingResponse<PostDto> myPostByEmail(String userEmail);
 
 	/**
 	 * 게시글 페이징 처리
