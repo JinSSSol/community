@@ -1,5 +1,7 @@
 package com.zerobase.community.post.service.impl;
 
+import static java.util.stream.Collectors.joining;
+
 import com.zerobase.community.common.model.PagingResponse;
 import com.zerobase.community.file.service.FileService;
 import com.zerobase.community.post.dto.PostDto;
@@ -112,7 +114,14 @@ public class PostServiceImpl implements PostService {
 	}
 
 	@Override
-	public boolean delete(String idList) {
+	public boolean delete(Long postId) {
+		postRepository.deleteById(postId);
+		fileService.deleteByPostId(postId);
+		return true;
+	}
+
+	@Override
+	public boolean deleteByIdList(String idList) {
 		if (idList != null && idList.length() > 0) {
 			String[] ids = idList.split(",");
 			for (String x : ids) {
@@ -120,8 +129,7 @@ public class PostServiceImpl implements PostService {
 				postId = Long.parseLong(x);
 
 				if (postId > 0) {
-					postRepository.deleteById(postId);
-					fileService.deleteByPostId(postId);
+					delete(postId);
 				}
 			}
 		}
@@ -145,6 +153,22 @@ public class PostServiceImpl implements PostService {
 		}
 
 		return true;
+	}
+
+	@Override
+	public boolean deleteByUserId(Long userId) {
+
+		this.deleteByIdList(this.getIdListByUserId(userId));
+
+		return true;
+	}
+
+	@Override
+	public String getIdListByUserId(Long userId) {
+		List<Post> posts = postRepository.findAllByUserId(userId)
+			.orElseThrow(() -> new IllegalArgumentException("Post doesn't exist"));
+
+		return posts.stream().map(p -> String.valueOf(p.getPostId())).collect(joining(","));
 	}
 
 }

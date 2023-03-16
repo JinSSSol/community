@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>회원 상세 페이지</title>
+  <style>
+    .detail table {
+      border-collapse: collapse;
+      width: 70%;
+    }
+
+    .detail table th, .detail table td {
+      border: solid 1px #000;
+      padding: 10px 5px;
+    }
+
+    .detail .division {
+      width: 10%;
+    }
+
+    .buttons {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .buttons a, .buttons button {
+      border-width: 0;
+      background-color: transparent;
+      text-decoration: underline;
+      font-size: 14px;
+      line-height: 20px;
+      height: 20px;
+      color: #000;
+      cursor: pointer;
+    }
+  </style>
+
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+          integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+          crossorigin="anonymous"></script>
+  <script>
+    $(document).ready(function () {
+
+      $('#deleteButton').on('click', function () {
+
+        if (!confirm(' 회원을 탈퇴하시겠습니까? ')) {
+          return false;
+        }
+
+      });
+    });
+  </script>
+
+</head>
+<body>
+<div th:replace="/fragments/layout.html :: fragment-body-menu"></div>
+
+<div>
+  <div class="detail">
+    <table>
+      <thead>
+      <tr>
+        <th class="division"></th>
+        <th></th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+        <td>
+          <p>회원 이메일</p>
+        </td>
+        <td>
+          <span th:text="${detail.userEmail}">이메일</span>
+        </td>
+      </tr>
+
+      <tr>
+        <td>
+          <p>회원 이름</p>
+        </td>
+        <td>
+          <span th:text="${detail.userName}">아름</span>
+        </td>
+      </tr>
+
+      <tr>
+        <td>
+          <p>생년월일</p>
+        </td>
+        <td>
+          <div th:text="${detail.userBirth}">생년월일</div>
+        </td>
+      </tr>
+
+      <tr>
+        <td>
+          <p>가입일자</p>
+        </td>
+        <td>
+          <span th:text="${detail.createAt}">가입일자</span>
+        </td>
+      </tr>
+
+      <tr>
+        <td>
+          <p>관리자 여부</p>
+        </td>
+        <td>
+          <span th:text="${detail.adminYn}">y</span>
+        </td>
+      </tr>
+
+
+      </tbody>
+    </table>
+
+    <div class="buttons">
+      <a href="javascript:history.back(-1)"> 목록 이동 </a>
+    </div>
+
+    <form name="deleteForm" method="post" th:action="@{'/admin/user/' + ${detail.userId}}">
+      <input type="hidden" name="_method" th:value="delete"/>
+      <button id="deleteButton" type="submit"> 회원 탈퇴</button>
+    </form>
+
+  </div>
+
+</div>
+
+</body>
+</html>

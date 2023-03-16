@@ -75,7 +75,7 @@ public class PostController {
 
 	@PostMapping("/post/delete")
 	public String delete(PostInput parameter) {
-		boolean result = postService.delete(parameter.getIdList());
+		boolean result = postService.deleteByIdList(parameter.getIdList());
 		return "redirect:/user/post/list";
 	}
 

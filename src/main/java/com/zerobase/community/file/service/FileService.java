@@ -10,7 +10,7 @@ public interface FileService {
 	/**
 	 * 파일 저장
 	 */
-	public Long saveFile(MultipartFile files, Long postId) throws IOException;
+	Long saveFile(MultipartFile files, Long postId) throws IOException;
 
 	/**
 	 * 파일 삭제
@@ -20,7 +20,7 @@ public interface FileService {
 	/**
 	 * 해당 게시글의 모든 파일 삭제
 	 */
-	public boolean deleteByPostId(Long postId);
+	boolean deleteByPostId(Long postId);
 
 	/**
 	 * 파일 상세 정보
@@ -31,4 +31,5 @@ public interface FileService {
 	 * 해당 게시글 파일 정보 가져오기
 	 */
 	List<FileDto> getByPostId(Long postId);
+
 }

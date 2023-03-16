@@ -1,9 +1,14 @@
 package com.zerobase.community.user.service.impl;
 
+import com.zerobase.community.common.model.PagingResponse;
+import com.zerobase.community.user.dto.UserDto;
 import com.zerobase.community.user.entity.User;
+import com.zerobase.community.user.mapper.UserMapper;
 import com.zerobase.community.user.model.UserInput;
+import com.zerobase.community.user.model.UserParam;
 import com.zerobase.community.user.repository.UserRepository;
 import com.zerobase.community.user.service.UserService;
+import com.zerobase.community.util.PageUtil;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +21,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 
 @RequiredArgsConstructor
@@ -23,6 +29,7 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl implements UserService {
 
 	private final UserRepository userRepository;
+	private final UserMapper userMapper;
 
 	@Override
 	public boolean register(UserInput parameter) {
@@ -54,6 +61,49 @@ public class UserServiceImpl implements UserService {
 		userRepository.save(user);
 
 		return true;
+	}
+
+	@Override
+	public boolean delete(Long userId) {
+		userRepository.deleteById(userId);
+		return true;
+	}
+
+	@Override
+	public PagingResponse<UserDto> list(UserParam parameter) {
+		parameter.init();
+		long totalCount = userMapper.selectListCount(parameter);
+		List<UserDto> list = userMapper.selectList(parameter);
+
+		String pager = userPager(list, parameter, totalCount);
+
+		return new PagingResponse<>(list, pager, totalCount);
+	}
+
+	@Override
+	public UserDto getById(Long userId) {
+
+		User user = userRepository.findById(userId)
+			.orElseThrow(() -> new IllegalArgumentException("User doesn't exist"));
+
+		return UserDto.of(user);
+	}
+
+	@Override
+	public String userPager(List<UserDto> list, UserParam parameter, long totalCount) {
+
+		PageUtil pageUtil = new PageUtil(totalCount, parameter.getPageIndex(),
+			parameter.getQueryString());
+
+		if (!CollectionUtils.isEmpty(list)) {
+			int i = 0;
+			for (UserDto x : list) {
+				x.setTotalCount(totalCount);
+				x.setSeq(totalCount - parameter.getPageStart() - i);
+				i++;
+			}
+		}
+		return pageUtil.pager();
 	}
 
 	@Override
