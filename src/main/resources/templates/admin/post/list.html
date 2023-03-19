@@ -40,13 +40,13 @@
           return false;
         }
 
-        var idList = [];
+        var ids = [];
         $checked.each(function(k, v) {
-          idList.push($(this).val());
+          ids.push($(this).val());
         });
 
         var $deleteForm = $('form[name=deleteForm]');
-        $deleteForm.find('input[name=idList]').val( idList.join(',') );
+        $deleteForm.find('input[name=ids]').val( ids );
         $deleteForm.submit();
 
       });
@@ -112,7 +112,7 @@
 </div>
 
 <form name="deleteForm" method="post" action="/post/delete">
-  <input type="hidden" name="idList"/>
+  <input type="hidden" name="ids"/>
 </form>
 
 </body>

@@ -75,7 +75,7 @@ public class PostController {
 
 	@PostMapping("/post/delete")
 	public String delete(HttpServletRequest request, PostInput parameter) {
-		boolean result = postService.deleteByIdList(parameter.getIdList());
+		boolean result = postService.deleteAll(parameter.getIds());
 		return "redirect:" + request.getHeader("Referer");
 	}
 

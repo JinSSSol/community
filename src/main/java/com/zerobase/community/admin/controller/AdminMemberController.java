@@ -24,7 +24,7 @@ public class AdminMemberController {
 	private final AdminService adminService;
 	private final UserService userService;
 
-	@GetMapping()
+	@GetMapping
 	public String userList(Model model, @Valid UserParam parameter) {
 
 		PagingResponse<UserDto> users = userService.list(parameter);
@@ -46,7 +46,7 @@ public class AdminMemberController {
 	@DeleteMapping("/{userId}")
 	public String userDelete(@PathVariable @NotBlank Long userId) {
 		adminService.deleteUser(userId);
-		return "redirect:/admin/user/list";
+		return "redirect:/admin/user";
 	}
 
 
