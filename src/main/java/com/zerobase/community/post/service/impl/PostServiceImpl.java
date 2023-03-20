@@ -1,6 +1,8 @@
 package com.zerobase.community.post.service.impl;
 
 import com.zerobase.community.common.model.PagingResponse;
+import com.zerobase.community.exception.CustomException;
+import com.zerobase.community.exception.ErrorCode;
 import com.zerobase.community.file.service.FileService;
 import com.zerobase.community.post.dto.PostDto;
 import com.zerobase.community.post.entity.Post;
@@ -36,7 +38,7 @@ public class PostServiceImpl implements PostService {
 	@Override
 	public boolean add(PostInput parameter) throws IOException {
 		User user = userRepository.findByUserEmail(parameter.getUserEmail())
-			.orElseThrow(() -> new IllegalArgumentException("user doesn't exist"));
+			.orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
 		Post post = Post.builder()
 			.postId(parameter.getPostId())
@@ -72,7 +74,7 @@ public class PostServiceImpl implements PostService {
 	@Override
 	public PostDto getById(long postId) {
 		Post post = postRepository.findById(postId)
-			.orElseThrow(() -> new IllegalArgumentException("Post doesn't exist"));
+			.orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
 		PostDto postDto = PostDto.of(post);
 		postDto.setFiles(fileService.getByPostId(postId));
@@ -99,7 +101,7 @@ public class PostServiceImpl implements PostService {
 	@Override
 	public PagingResponse<PostDto> myPostByEmail(String userEmail) {
 		User user = userRepository.findByUserEmail(userEmail)
-			.orElseThrow(() -> new IllegalArgumentException("User doesn't exist"));
+			.orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
 		return this.myPost(user.getUserId());
 	}
@@ -141,7 +143,7 @@ public class PostServiceImpl implements PostService {
 	public boolean update(PostInput parameter) throws IOException {
 
 		Post post = postRepository.findById(parameter.getPostId())
-			.orElseThrow(() -> new IllegalArgumentException("Post doesn't exist"));
+			.orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
 		post.setTitle(parameter.getTitle());
 		post.setContents(parameter.getContents());
@@ -160,7 +162,7 @@ public class PostServiceImpl implements PostService {
 	public boolean deleteByUserId(Long userId) {
 
 		List<Post> posts = postRepository.findAllByUserId(userId)
-			.orElseThrow(() -> new IllegalArgumentException("Post doesn't exist"));
+			.orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND_BY_USER));
 		posts.stream().map(p -> p.getPostId()).forEach(p -> this.delete(p));
 
 		return true;

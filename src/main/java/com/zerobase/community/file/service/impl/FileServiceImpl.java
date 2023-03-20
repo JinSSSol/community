@@ -1,5 +1,7 @@
 package com.zerobase.community.file.service.impl;
 
+import com.zerobase.community.exception.CustomException;
+import com.zerobase.community.exception.ErrorCode;
 import com.zerobase.community.file.dto.FileDto;
 import com.zerobase.community.file.entity.File;
 import com.zerobase.community.file.repository.FileRepository;
@@ -71,7 +73,7 @@ public class FileServiceImpl implements FileService {
 	public boolean deleteByPostId(Long postId) {
 		List<FileDto> files = this.getByPostId(postId);
 
-		for (FileDto file : files) {
+		for (FileDto file: files) {
 			this.delete(file.getFileId());
 		}
 
@@ -81,7 +83,7 @@ public class FileServiceImpl implements FileService {
 	@Override
 	public FileDto getById(Long fileId) {
 		File file = fileRepository.findById(fileId)
-			.orElseThrow(() -> new IllegalArgumentException("File doesn't exist"));
+			.orElseThrow(() -> new CustomException(ErrorCode.FILE_NOT_FOUND));
 		return FileDto.of(file);
 	}
 
@@ -91,6 +93,5 @@ public class FileServiceImpl implements FileService {
 			.orElse(Collections.emptyList());
 		return FileDto.of(files);
 	}
-
 
 }

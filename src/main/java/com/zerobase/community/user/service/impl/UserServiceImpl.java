@@ -1,6 +1,8 @@
 package com.zerobase.community.user.service.impl;
 
 import com.zerobase.community.common.model.PagingResponse;
+import com.zerobase.community.exception.CustomException;
+import com.zerobase.community.exception.ErrorCode;
 import com.zerobase.community.user.dto.UserDto;
 import com.zerobase.community.user.entity.User;
 import com.zerobase.community.user.mapper.UserMapper;
@@ -84,7 +86,7 @@ public class UserServiceImpl implements UserService {
 	public UserDto getById(Long userId) {
 
 		User user = userRepository.findById(userId)
-			.orElseThrow(() -> new IllegalArgumentException("User doesn't exist"));
+			.orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
 		return UserDto.of(user);
 	}
