@@ -6,11 +6,12 @@ import com.zerobase.community.common.model.PagingResponse;
 import com.zerobase.community.user.dto.UserDto;
 import com.zerobase.community.user.model.UserParam;
 import com.zerobase.community.user.service.UserService;
-import javax.validation.Valid;
+import com.zerobase.community.valid.Group;
 import javax.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,7 +26,7 @@ public class AdminMemberController {
 	private final UserService userService;
 
 	@GetMapping
-	public String userList(Model model, @Valid UserParam parameter) {
+	public String userList(Model model, @Validated(Group.UserSearch.class) UserParam parameter) {
 
 		PagingResponse<UserDto> users = userService.list(parameter);
 

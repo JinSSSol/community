@@ -18,10 +18,11 @@ import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-
+@Transactional
 @RequiredArgsConstructor
 @Service
 public class PostServiceImpl implements PostService {
@@ -54,6 +55,7 @@ public class PostServiceImpl implements PostService {
 		return true;
 	}
 
+	@Transactional(readOnly = true)
 	@Override
 	public PagingResponse<PostDto> list(PostParam parameter) {
 		parameter.init();
@@ -66,6 +68,7 @@ public class PostServiceImpl implements PostService {
 	}
 
 
+	@Transactional(readOnly = true)
 	@Override
 	public PostDto getById(long postId) {
 		Post post = postRepository.findById(postId)
@@ -77,6 +80,7 @@ public class PostServiceImpl implements PostService {
 		return postDto;
 	}
 
+	@Transactional(readOnly = true)
 	@Override
 	public PagingResponse<PostDto> myPost(Long userId) {
 
