@@ -11,11 +11,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class FileServiceImpl implements FileService {
@@ -51,6 +52,7 @@ public class FileServiceImpl implements FileService {
 		file.transferTo(localFile);
 
 		File savedFile = fileRepository.save(fileEntity);
+		log.info("File saved ! -> " + savedPath);
 
 		return savedFile.getFileId();
 	}
@@ -65,6 +67,7 @@ public class FileServiceImpl implements FileService {
 		}
 
 		fileRepository.deleteById(fileId);
+		log.info("File deletion complete ! -> " + fileDto.getFileId());
 		return true;
 
 	}
@@ -73,7 +76,7 @@ public class FileServiceImpl implements FileService {
 	public boolean deleteByPostId(Long postId) {
 		List<FileDto> files = this.getByPostId(postId);
 
-		for (FileDto file: files) {
+		for (FileDto file : files) {
 			this.delete(file.getFileId());
 		}
 
