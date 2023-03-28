@@ -1,4 +1,4 @@
-package com.zerobase.community.configuration;
+package com.zerobase.community.config;
 
 import java.io.IOException;
 import javax.servlet.ServletException;

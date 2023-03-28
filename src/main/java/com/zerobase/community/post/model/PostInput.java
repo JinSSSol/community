@@ -27,6 +27,6 @@ public class PostInput {
 	List<MultipartFile> files;
 
 	// 삭제
-	String idList;
+	List<Long> ids;
 
 }

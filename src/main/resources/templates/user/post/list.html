@@ -36,17 +36,18 @@
           return false;
         }
 
+
         if (!confirm(' 선택한 데이터를 삭제하시겠습니까? ')) {
           return false;
         }
 
-        var idList = [];
+        var ids = [];
         $checked.each(function(k, v) {
-          idList.push($(this).val());
+          ids.push($(this).val());
         });
 
         var $deleteForm = $('form[name=deleteForm]');
-        $deleteForm.find('input[name=idList]').val( idList.join(',') );
+        $deleteForm.find('input[name=ids]').val( ids );
         $deleteForm.submit();
 
       });
@@ -55,60 +56,60 @@
 
 </head>
 <body>
-  <div th:replace="/fragments/layout.html :: fragment-body-menu"></div>
-  <h>나의 게시글 관리</h></h1>
+<div th:replace="/fragments/layout.html :: fragment-body-menu"></div>
+<h>나의 게시글 관리</h></h1>
 
-  <div class="list">
+<div class="list">
 
-    <div class="buttons">
-      <p class="total-count">전체 <span th:text="${totalCount}"></span>개</p>
-      <button id="deleteButton" type="button">선택 삭제</button>
-    </div>
-
-    <table>
-      <thead>
-      <tr>
-        <th>
-          <input id="selectAll" type="checkbox" />
-        </th>
-        <th> NO</th>
-        <th>
-          게시글 제목
-        </th>
-
-        <th>
-          작성일시
-        </th>
-
-      </tr>
-      </thead>
-      <tbody id="dataLIst">
-      <tr th:each="x : ${list}">
-        <td>
-          <input type="checkbox" th:value="${x.postId}" />
-        </td>
-        <td th:text="${x.seq}">1</td>
-        <td>
-          <p>
-            <a th:href="'/post/detail/' + ${x.postId}" th:text="${x.title}">제목</a>
-          </p>
-        </td>
-        <td>
-          <p th:text="${x.createAt}">2021.01.01</p>
-        </td>
-        <td>
-          <a th:href="'update/' + ${x.postId}">수정</a>
-        </td>
-      </tr>
-      </tbody>
-    </table>
+  <div class="buttons">
+    <p class="total-count">전체 <span th:text="${totalCount}"></span>개</p>
+    <button id="deleteButton" type="button">선택 삭제</button>
   </div>
 
-  <div class="pager" th:utext="${pager}">
-  </div>
+  <table>
+    <thead>
+    <tr>
+      <th>
+        <input id="selectAll" type="checkbox" />
+      </th>
+      <th> NO</th>
+      <th>
+        게시글 제목
+      </th>
+
+      <th>
+        작성일시
+      </th>
+
+    </tr>
+    </thead>
+    <tbody id="dataLIst">
+    <tr th:each="x : ${list}">
+      <td>
+        <input type="checkbox" th:value="${x.postId}" />
+      </td>
+      <td th:text="${x.seq}">1</td>
+      <td>
+        <p>
+          <a th:href="'/post/detail/' + ${x.postId}" th:text="${x.title}">제목</a>
+        </p>
+      </td>
+      <td>
+        <p th:text="${x.createAt}">2021.01.01</p>
+      </td>
+      <td>
+        <a th:href="'update/' + ${x.postId}">수정</a>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="pager" th:utext="${pager}">
+</div>
 
 <form name="deleteForm" method="post" action="/post/delete">
-  <input type="hidden" name="idList"/>
+  <input type="hidden" name="ids"/>
 </form>
 
 </body>

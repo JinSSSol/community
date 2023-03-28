@@ -1,8 +1,8 @@
 package com.zerobase.community.post.service.impl;
 
-import static java.util.stream.Collectors.joining;
-
 import com.zerobase.community.common.model.PagingResponse;
+import com.zerobase.community.exception.CustomException;
+import com.zerobase.community.exception.ErrorCode;
 import com.zerobase.community.file.service.FileService;
 import com.zerobase.community.post.dto.PostDto;
 import com.zerobase.community.post.entity.Post;
@@ -20,10 +20,11 @@ import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-
+@Transactional
 @RequiredArgsConstructor
 @Service
 public class PostServiceImpl implements PostService {
@@ -37,7 +38,7 @@ public class PostServiceImpl implements PostService {
 	@Override
 	public boolean add(PostInput parameter) throws IOException {
 		User user = userRepository.findByUserEmail(parameter.getUserEmail())
-			.orElseThrow(() -> new IllegalArgumentException("user doesn't exist"));
+			.orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
 		Post post = Post.builder()
 			.postId(parameter.getPostId())
@@ -56,6 +57,7 @@ public class PostServiceImpl implements PostService {
 		return true;
 	}
 
+	@Transactional(readOnly = true)
 	@Override
 	public PagingResponse<PostDto> list(PostParam parameter) {
 		parameter.init();
@@ -67,10 +69,12 @@ public class PostServiceImpl implements PostService {
 		return new PagingResponse<>(list, pager, totalCount);
 	}
 
+
+	@Transactional(readOnly = true)
 	@Override
 	public PostDto getById(long postId) {
 		Post post = postRepository.findById(postId)
-			.orElseThrow(() -> new IllegalArgumentException("Post doesn't exist"));
+			.orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
 		PostDto postDto = PostDto.of(post);
 		postDto.setFiles(fileService.getByPostId(postId));
@@ -78,6 +82,7 @@ public class PostServiceImpl implements PostService {
 		return postDto;
 	}
 
+	@Transactional(readOnly = true)
 	@Override
 	public PagingResponse<PostDto> myPost(Long userId) {
 
@@ -96,7 +101,7 @@ public class PostServiceImpl implements PostService {
 	@Override
 	public PagingResponse<PostDto> myPostByEmail(String userEmail) {
 		User user = userRepository.findByUserEmail(userEmail)
-			.orElseThrow(() -> new IllegalArgumentException("User doesn't exist"));
+			.orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
 		return this.myPost(user.getUserId());
 	}
@@ -127,17 +132,9 @@ public class PostServiceImpl implements PostService {
 	}
 
 	@Override
-	public boolean deleteByIdList(String idList) {
-		if (idList != null && idList.length() > 0) {
-			String[] ids = idList.split(",");
-			for (String x : ids) {
-				long postId = 0L;
-				postId = Long.parseLong(x);
-
-				if (postId > 0) {
-					delete(postId);
-				}
-			}
+	public boolean deleteAll(List<Long> postIds) {
+		if (!CollectionUtils.isEmpty(postIds)) {
+			postIds.stream().forEach(p -> this.delete(p));
 		}
 		return true;
 	}
@@ -146,7 +143,7 @@ public class PostServiceImpl implements PostService {
 	public boolean update(PostInput parameter) throws IOException {
 
 		Post post = postRepository.findById(parameter.getPostId())
-			.orElseThrow(() -> new IllegalArgumentException("Post doesn't exist"));
+			.orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
 		post.setTitle(parameter.getTitle());
 		post.setContents(parameter.getContents());
@@ -164,17 +161,11 @@ public class PostServiceImpl implements PostService {
 	@Override
 	public boolean deleteByUserId(Long userId) {
 
-		this.deleteByIdList(this.getIdListByUserId(userId));
+		List<Post> posts = postRepository.findAllByUserId(userId)
+			.orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND_BY_USER));
+		posts.stream().map(p -> p.getPostId()).forEach(p -> this.delete(p));
 
 		return true;
-	}
-
-	@Override
-	public String getIdListByUserId(Long userId) {
-		List<Post> posts = postRepository.findAllByUserId(userId)
-			.orElseThrow(() -> new IllegalArgumentException("Post doesn't exist"));
-
-		return posts.stream().map(p -> String.valueOf(p.getPostId())).collect(joining(","));
 	}
 
 }

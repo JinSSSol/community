@@ -9,6 +9,7 @@ import com.zerobase.community.post.dto.PostDto;
 import com.zerobase.community.post.model.PostInput;
 import com.zerobase.community.post.model.PostParam;
 import com.zerobase.community.post.service.PostService;
+import com.zerobase.community.valid.Group;
 import java.io.IOException;
 import java.security.Principal;
 import javax.servlet.http.HttpServletRequest;
@@ -19,6 +20,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -47,7 +49,7 @@ public class PostController {
 	}
 
 	@GetMapping("/post/list")
-	public String list(Model model, @Valid PostParam parameter) {
+	public String list(Model model, @Validated(Group.PostSearch.class) PostParam parameter) {
 		PagingResponse<PostDto> posts = postService.list(parameter);
 
 		model.addAttribute("list", posts.getList());
@@ -75,7 +77,7 @@ public class PostController {
 
 	@PostMapping("/post/delete")
 	public String delete(HttpServletRequest request, PostInput parameter) {
-		boolean result = postService.deleteByIdList(parameter.getIdList());
+		boolean result = postService.deleteAll(parameter.getIds());
 		return "redirect:" + request.getHeader("Referer");
 	}
 

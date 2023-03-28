@@ -47,7 +47,7 @@ public interface PostService {
 	/**
 	 * 선택된 게시글 삭제
 	 */
-	boolean deleteByIdList(String idList);
+	boolean deleteAll(List<Long> postIds);
 
 	/**
 	 * 게시글 수정
@@ -59,8 +59,4 @@ public interface PostService {
 	 */
 	boolean deleteByUserId(Long userId);
 
-	/**
-	 * 해당 회원의 게시글 idList 가져오기
-	 */
-	String getIdListByUserId(Long userId);
 }

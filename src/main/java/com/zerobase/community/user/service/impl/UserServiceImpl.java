@@ -1,6 +1,8 @@
 package com.zerobase.community.user.service.impl;
 
 import com.zerobase.community.common.model.PagingResponse;
+import com.zerobase.community.exception.CustomException;
+import com.zerobase.community.exception.ErrorCode;
 import com.zerobase.community.user.dto.UserDto;
 import com.zerobase.community.user.entity.User;
 import com.zerobase.community.user.mapper.UserMapper;
@@ -15,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,7 +26,7 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class UserServiceImpl implements UserService {
@@ -59,6 +62,7 @@ public class UserServiceImpl implements UserService {
 			.build();
 
 		userRepository.save(user);
+		log.info("User registration complete! -> " + user.getUserId());
 
 		return true;
 	}
@@ -66,6 +70,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public boolean delete(Long userId) {
 		userRepository.deleteById(userId);
+		log.info("User deletion complete! -> " + userId);
 		return true;
 	}
 
@@ -84,7 +89,7 @@ public class UserServiceImpl implements UserService {
 	public UserDto getById(Long userId) {
 
 		User user = userRepository.findById(userId)
-			.orElseThrow(() -> new IllegalArgumentException("User doesn't exist"));
+			.orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
 		return UserDto.of(user);
 	}
@@ -118,6 +123,7 @@ public class UserServiceImpl implements UserService {
 		if (user.isAdminYn()) {
 			grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
 		}
+
 		return new org.springframework.security.core.userdetails.User(user.getUserEmail(),
 			user.getUserPassword(), grantedAuthorities);
 	}

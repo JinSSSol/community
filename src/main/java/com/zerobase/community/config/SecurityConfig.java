@@ -1,4 +1,4 @@
-package com.zerobase.community.configuration;
+package com.zerobase.community.config;
 
 import com.zerobase.community.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -16,9 +16,10 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @RequiredArgsConstructor
 @EnableWebSecurity
 @Configuration
-public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	private final UserService userService;
+	private final UserAuthenticationSuccessHandler userAuthenticationSuccessHandler;
 	@Bean
 	PasswordEncoder getPasswordEncoder() {
 		return new BCryptPasswordEncoder();
@@ -47,7 +48,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				"/"
 				, "/user/register"
 				, "/user/register_admin"
-				//, "/user/find_password"
 				, "/post/list"
 				, "/post/detail/*"
 				, "/images/*"
@@ -62,6 +62,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 			.loginPage("/user/login")
 			.usernameParameter("userEmail")
 			.failureHandler(getFailureHandler())
+			.successHandler(userAuthenticationSuccessHandler)
 			.permitAll();
 
 		http.logout()
