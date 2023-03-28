@@ -1,6 +1,6 @@
 package com.zerobase.community.common.model;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+
+import javax.validation.constraints.Size;
 import lombok.Data;
 
 @Data
@@ -9,7 +9,10 @@ public class CommonParam {
 	long pageIndex;
 	long pageSize;
 
+	@Size(max = 9)
 	String searchType;
+
+	@Size(max = 100, message = "검색은 100자 이하로 가능합니다.")
 	String searchValue;
 
 
