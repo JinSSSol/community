@@ -89,7 +89,7 @@
             <p>이미지</p>
           </td>
           <td>
-            <div th:each="imageFile : ${files}">
+            <div th:each="imageFile : ${detail.files}">
               <img th:src="|/images/${imageFile.fileId}|" width="150" height="150">
               <p th:text="${imageFile.originName}">이미지</p>
             </div>
@@ -100,7 +100,7 @@
     </table>
 
     <div class="buttons">
-      <a href="/post/list"> 목록 이동 </a>
+      <a href="javascript:history.back(-1)"> 목록 이동 </a>
     </div>
 
   </div>
