@@ -8,6 +8,7 @@ import com.zerobase.community.user.entity.User;
 import com.zerobase.community.user.mapper.UserMapper;
 import com.zerobase.community.user.model.UserInput;
 import com.zerobase.community.user.model.UserParam;
+import com.zerobase.community.user.model.constrains.Role;
 import com.zerobase.community.user.repository.UserRepository;
 import com.zerobase.community.user.service.UserService;
 import com.zerobase.community.util.PageUtil;
@@ -118,10 +119,10 @@ public class UserServiceImpl implements UserService {
 			.orElseThrow(() -> new UsernameNotFoundException("회원 정보가 존재하지 않습니다."));
 
 		List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
-		grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+		grantedAuthorities.add(new SimpleGrantedAuthority(Role.USER.getKey()));
 
 		if (user.isAdminYn()) {
-			grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+			grantedAuthorities.add(new SimpleGrantedAuthority(Role.ADMIN.getKey()));
 		}
 
 		return new org.springframework.security.core.userdetails.User(user.getUserEmail(),
