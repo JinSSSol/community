@@ -1,8 +1,8 @@
 package com.zerobase.community.config;
 
-import com.zerobase.community.config.auth.CustomOAuth2UserService;
-import com.zerobase.community.config.auth.JwtAuthenticationFilter;
-import com.zerobase.community.config.auth.OAuthAuthenticationSuccessHandler;
+import com.zerobase.community.config.oauth.CustomOAuth2UserService;
+import com.zerobase.community.config.jwt.JwtAuthenticationFilter;
+import com.zerobase.community.config.oauth.OAuthAuthenticationSuccessHandler;
 import com.zerobase.community.user.model.constrains.Role;
 import com.zerobase.community.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -60,6 +60,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				, "/post/list"
 				, "/post/detail/*"
 				, "/images/*"
+				, "/oauth2/authorization/google"
+				, "/login/oauth2/code/google"
 			)
 			.permitAll();
 
@@ -83,7 +85,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			.accessDeniedPage("/error/denied");
 
 		http.oauth2Login()
-			//.defaultSuccessUrl("/")
+			.defaultSuccessUrl("/")
 			.successHandler(oAuthAuthenticationSuccessHandler)
 			.userInfoEndpoint().userService(customOAuth2UserService);
 
@@ -100,7 +102,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 		super.configure(auth);
 	}
-
 
 
 }

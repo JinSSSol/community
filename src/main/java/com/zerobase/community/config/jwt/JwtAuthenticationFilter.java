@@ -1,5 +1,7 @@
-package com.zerobase.community.config.auth;
+package com.zerobase.community.config.jwt;
 
+import com.zerobase.community.exception.CustomException;
+import com.zerobase.community.exception.ErrorCode;
 import com.zerobase.community.user.entity.User;
 import com.zerobase.community.user.repository.UserRepository;
 import com.zerobase.community.util.PasswordUtil;
@@ -8,7 +10,6 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import jdk.nashorn.internal.parser.Token;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,7 +19,6 @@ import org.springframework.security.core.authority.mapping.NullAuthoritiesMapper
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -27,8 +27,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-	public static final String TOKEN_HEADER = "Authorization";
-	public static final String TOKEN_PREFIX = "Bearer ";
 	public final TokenProvider tokenProvider;
 	public final UserRepository userRepository;
 	private GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
@@ -36,6 +34,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
 		FilterChain filterChain) throws ServletException, IOException {
+
+		if (request.getRequestURI().contains("login")) {
+			filterChain.doFilter(request, response);
+			return;
+		}
+		if (request.getRequestURI().equals("/")) {
+			filterChain.doFilter(request, response);
+			return;
+		}
+		if (request.getRequestURI().contains("oauth2")) {
+			filterChain.doFilter(request, response);
+			return;
+		}
 
 		String refreshToken = tokenProvider.extractRefreshToken(request)
 			.filter(tokenProvider::isTokenValid)
@@ -50,11 +61,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		checkAccessTokenAndAuthentication(request, response, filterChain);
 	}
 
-	public void checkRefreshTokenAndReIssueAccessToken(HttpServletResponse response, String refreshToken) {
+	public void checkRefreshTokenAndReIssueAccessToken(HttpServletResponse response,
+		String refreshToken) {
 		userRepository.findByRefreshToken(refreshToken)
 			.ifPresent(user -> {
 				String reIssuedRefreshToken = reIssueRefreshToken(user);
-				tokenProvider.sendAccessAndRefreshToken(response, tokenProvider.generateAccessToken(user.getUserEmail(), user.getRoleKey()), reIssuedRefreshToken);
+				try {
+					tokenProvider.sendAccessAndRefreshToken(response,
+						tokenProvider.generateAccessToken(user.getUserEmail(), user.getRoleKey()),
+						reIssuedRefreshToken);
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
 			});
 	}
 
@@ -65,16 +83,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		return reIssuedRefreshToken;
 	}
 
-	public void checkAccessTokenAndAuthentication(HttpServletRequest request, HttpServletResponse response,
+	public void checkAccessTokenAndAuthentication(HttpServletRequest request,
+		HttpServletResponse response,
 		FilterChain filterChain) throws ServletException, IOException {
 		log.info("checkAccessTokenAndAuthentication() 호출");
-		tokenProvider.extractAccessToken(request)
+		String token = tokenProvider.extractAccessToken(request)
 			.filter(tokenProvider::isTokenValid)
-			.ifPresent(accessToken -> tokenProvider.extractEmail(accessToken)
-				.ifPresent(email -> userRepository.findByUserEmail(email)
-					.ifPresent(this::saveAuthentication)));
+			.orElseThrow(() -> new CustomException(ErrorCode.NOT_VALID_TOKEN));
 
-		//System.out.println((tokenProvider.isTokenValid(tokenProvider.extractAccessToken(request).get())));
+		String email = tokenProvider.extractEmail(token)
+			.orElseThrow(() -> new CustomException(ErrorCode.NOT_VALID_TOKEN));
+
+		userRepository.findByUserEmail(email)
+			.ifPresent(this::saveAuthentication);
+
 		filterChain.doFilter(request, response);
 	}
 
@@ -87,7 +109,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		UserDetails userDetails = org.springframework.security.core.userdetails.User.builder()
 			.username(user.getUserEmail())
 			.password(password)
-			.roles(user.getRoleKey())
+			.roles(user.getRole().name())
 			.build();
 
 		Authentication authentication =

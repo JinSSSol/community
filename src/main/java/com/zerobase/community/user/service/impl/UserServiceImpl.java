@@ -49,8 +49,11 @@ public class UserServiceImpl implements UserService {
 		LocalDate birth = LocalDate.parse(birtStr);
 
 		boolean adminYn = false;
+		Role role = Role.USER;
+
 		if (parameter.getAdminAuthStatus().equals("success")) {
 			adminYn = true;
+			role = Role.ADMIN;
 		}
 
 		User user = User.builder()
@@ -60,6 +63,7 @@ public class UserServiceImpl implements UserService {
 			.userBirth(birth)
 			.createAt(LocalDate.now())
 			.adminYn(adminYn)
+			.role(role)
 			.build();
 
 		userRepository.save(user);

@@ -1,6 +1,6 @@
 package com.zerobase.community.config;
 
-import com.zerobase.community.config.auth.TokenProvider;
+import com.zerobase.community.config.jwt.TokenProvider;
 import com.zerobase.community.exception.CustomException;
 import com.zerobase.community.exception.ErrorCode;
 import com.zerobase.community.user.entity.User;
@@ -37,8 +37,11 @@ public class UserAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuc
 
 
 		String accessToken = tokenProvider.generateAccessToken(email, user.getRoleKey());
+		String refreshToken = tokenProvider.generateRefreshToken();
 
-		tokenProvider.sendAccessToken(response, accessToken);
+		tokenProvider.sendAccessAndRefreshToken(response, accessToken, refreshToken);
+		tokenProvider.updateRefreshToken(email, refreshToken);
+
 		log.info("로그인에 성공하였습니다. 이메일 : {}", email);
 		log.info("로그인에 성공하였습니다. AccessToken : {}", accessToken);
 		log.info("발급된 AccessToken 만료 기간 : {}", accessTokenExpiration);

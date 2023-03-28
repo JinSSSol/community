@@ -1,11 +1,11 @@
-package com.zerobase.community.config.auth;
+package com.zerobase.community.config.oauth;
 
 import static com.zerobase.community.user.model.constrains.SocialType.KAKAO;
 import static com.zerobase.community.user.model.constrains.SocialType.NAVER;
 
-import com.zerobase.community.config.auth.dto.CustomOAuth2User;
-import com.zerobase.community.config.auth.dto.OAuthAttributes;
-import com.zerobase.community.config.auth.dto.SessionUser;
+import com.zerobase.community.config.oauth.dto.CustomOAuth2User;
+import com.zerobase.community.config.oauth.dto.OAuthAttributes;
+import com.zerobase.community.config.oauth.dto.SessionUser;
 import com.zerobase.community.user.entity.User;
 import com.zerobase.community.user.model.constrains.SocialType;
 import com.zerobase.community.user.repository.UserRepository;
@@ -18,7 +18,6 @@ import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserServ
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
-import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
@@ -45,7 +44,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 		OAuthAttributes attributes = OAuthAttributes.of(registrationId, userNameAttributeName,
 			oAuth2User.getAttributes());
 
-		User user = saveOrUpdate(attributes);
+		User user = saveOrUpdate(attributes, socialType);
 
 		httpSession.setAttribute("user", new SessionUser(user));
 
@@ -58,40 +57,21 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 	}
 
 	private SocialType getSocialType(String registrationId) {
-		if(NAVER.equals(registrationId)) {
+		if (NAVER.equals(registrationId)) {
 			return NAVER;
 		}
-		if(KAKAO.equals(registrationId)) {
+		if (KAKAO.equals(registrationId)) {
 			return KAKAO;
 		}
 		return SocialType.GOOGLE;
 	}
 
-	private User saveOrUpdate(OAuthAttributes attributes) {
+	private User saveOrUpdate(OAuthAttributes attributes, SocialType socialType) {
 		User user = userRepository.findByUserEmail(attributes.getEmail())
 			.map(entity -> entity.update(attributes.getName(), attributes.getPicture()))
-			.orElse(attributes.toEntity());
+			.orElse(attributes.toEntity(socialType));
 
 		return userRepository.save(user);
 	}
-
-//	private User getUser(OAuthAttributes attributes, SocialType socialType) {
-//		User findUser = userRepository.findBySocialTypeAndSocialId(socialType,
-//			attributes.getOauth2UserInfo().getId()).orElse(null);
-//
-//		if(findUser == null) {
-//			return saveUser(attributes, socialType);
-//		}
-//		return findUser;
-//	}
-//
-//	/**
-//	 * OAuthAttributes의 toEntity() 메소드를 통해 빌더로 User 객체 생성 후 반환
-//	 * 생성된 User 객체를 DB에 저장 : socialType, socialId, email, role 값만 있는 상태
-//	 */
-//	private User saveUser(OAuthAttributes attributes, SocialType socialType) {
-//		User createdUser = attributes.toEntity(socialType, attributes.getOauth2UserInfo());
-//		return userRepository.save(createdUser);
-//	}
 
 }

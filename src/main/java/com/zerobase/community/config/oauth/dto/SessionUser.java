@@ -1,4 +1,4 @@
-package com.zerobase.community.config.auth.dto;
+package com.zerobase.community.config.oauth.dto;
 
 import com.zerobase.community.user.entity.User;
 import java.io.Serializable;

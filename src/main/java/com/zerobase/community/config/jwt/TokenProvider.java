@@ -1,4 +1,4 @@
-package com.zerobase.community.config.auth;
+package com.zerobase.community.config.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -6,6 +6,9 @@ import com.zerobase.community.exception.CustomException;
 import com.zerobase.community.exception.ErrorCode;
 import com.zerobase.community.user.entity.User;
 import com.zerobase.community.user.repository.UserRepository;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import java.io.IOException;
 import java.util.Date;
 import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
@@ -46,6 +49,9 @@ public class TokenProvider {
 	private final UserRepository userRepository;
 
 	public String generateAccessToken(String username, String role) {
+		Claims claims = Jwts.claims().setSubject(username);
+		claims.put(KEY_ROLE, role);
+
 		var now = new Date();
 		var expireDate = new Date(now.getTime() + accessTokenExpirePeriod);
 
@@ -56,6 +62,7 @@ public class TokenProvider {
 			.withIssuedAt(now)    // 토큰 생성 시간
 			.withExpiresAt(expireDate)    // 토큰 만료 시간
 			.sign(Algorithm.HMAC512(secretKey));
+
 	}
 
 	public String generateRefreshToken() {
@@ -77,12 +84,14 @@ public class TokenProvider {
 	}
 
 	public void sendAccessAndRefreshToken(HttpServletResponse response, String accessToken,
-		String refreshToken) {
+		String refreshToken) throws IOException {
 		response.setStatus(HttpServletResponse.SC_OK);
 
 		response.setHeader(accessHeader, accessToken);
 		response.setHeader(refreshHeader, refreshToken);
+		response.sendRedirect("/");
 		log.info("Access Token, Refresh Token 헤더 설정 완료");
+		log.info("Access Token : " + accessToken);
 	}
 
 	public Optional<String> extractRefreshToken(HttpServletRequest request) {
@@ -126,5 +135,6 @@ public class TokenProvider {
 			.orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
 		user.updateRefreshToken(refreshToken);
+		userRepository.save(user);
 	}
 }

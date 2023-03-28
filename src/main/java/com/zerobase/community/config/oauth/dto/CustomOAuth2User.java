@@ -1,4 +1,4 @@
-package com.zerobase.community.config.auth.dto;
+package com.zerobase.community.config.oauth.dto;
 
 import com.zerobase.community.user.model.constrains.Role;
 import java.util.Collection;
