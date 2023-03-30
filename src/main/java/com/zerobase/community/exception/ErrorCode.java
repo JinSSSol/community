@@ -13,7 +13,9 @@ public enum ErrorCode {
 	USER_NOT_FOUND(HttpStatus.BAD_REQUEST, "해당 사용자를 찾을 수 없습니다."),
 	POST_NOT_FOUND(HttpStatus.BAD_REQUEST, "해당 게시글을 찾을 수 없습니다."),
 	POST_NOT_FOUND_BY_USER(HttpStatus.BAD_REQUEST, "해당 사용자의 게시글을 찾을 수 없습니다."),
-	FILE_NOT_FOUND(HttpStatus.BAD_REQUEST, "해당 파일을 찾을 수 없습니다.");
+	FILE_NOT_FOUND(HttpStatus.BAD_REQUEST, "해당 파일을 찾을 수 없습니다."),
+
+	NOT_VALID_TOKEN(HttpStatus.FORBIDDEN, "유효하지 않은 토큰입니다.");
 
 	private final HttpStatus status;
 	private final String message;

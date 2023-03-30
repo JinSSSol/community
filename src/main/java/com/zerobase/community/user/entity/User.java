@@ -1,8 +1,12 @@
 package com.zerobase.community.user.entity;
 
+import com.zerobase.community.user.model.constrains.Role;
+import com.zerobase.community.user.model.constrains.SocialType;
 import java.time.LocalDate;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -32,5 +36,34 @@ public class User {
 	private LocalDate createAt;
 
 	private boolean adminYn;
+
+	private String picture;
+	@Enumerated(EnumType.STRING)
+	private Role role;
+
+	@Enumerated(EnumType.STRING)
+	private SocialType socialType; // KAKAO, NAVER, GOOGLE
+	private String refreshToken;
+
+	// 유저 권한 설정 메소드
+	public void authorizeUser() {
+		this.role = Role.USER;
+	}
+
+	public void updateRefreshToken(String updateRefreshToken) {
+		this.refreshToken = updateRefreshToken;
+
+	}
+
+	public User update(String name, String picture) {
+		this.userName = userName;
+		this.picture = picture;
+
+		return this;
+	}
+
+	public String getRoleKey() {
+		return this.role.getKey();
+	}
 
 }

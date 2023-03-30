@@ -1,8 +1,9 @@
 package com.zerobase.community.util;
 
+import java.util.UUID;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 
-public class PasswordUtils {
+public class PasswordUtil {
 
 	public static boolean equals(String plaintext, String hashed) {
 
@@ -24,4 +25,7 @@ public class PasswordUtils {
 		return BCrypt.hashpw(plaintext, BCrypt.gensalt());
 	}
 
+	public static String generateRandomPassword() {
+		return encPassword(UUID.randomUUID().toString());
+	}
 }

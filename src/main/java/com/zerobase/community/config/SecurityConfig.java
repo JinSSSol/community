@@ -1,5 +1,9 @@
 package com.zerobase.community.config;
 
+import com.zerobase.community.config.oauth.CustomOAuth2UserService;
+import com.zerobase.community.config.jwt.JwtAuthenticationFilter;
+import com.zerobase.community.config.oauth.OAuthAuthenticationSuccessHandler;
+import com.zerobase.community.user.model.constrains.Role;
 import com.zerobase.community.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -11,6 +15,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @RequiredArgsConstructor
@@ -20,6 +25,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	private final UserService userService;
 	private final UserAuthenticationSuccessHandler userAuthenticationSuccessHandler;
+	private final CustomOAuth2UserService customOAuth2UserService;
+	private final OAuthAuthenticationSuccessHandler oAuthAuthenticationSuccessHandler;
+	private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
 	@Bean
 	PasswordEncoder getPasswordEncoder() {
 		return new BCryptPasswordEncoder();
@@ -51,12 +60,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				, "/post/list"
 				, "/post/detail/*"
 				, "/images/*"
+				, "/oauth2/authorization/google"
+				, "/login/oauth2/code/google"
 			)
 			.permitAll();
 
 		http.authorizeRequests()
 			.antMatchers("/admin/**")
-			.hasAuthority("ROLE_ADMIN");
+			.hasAuthority(Role.ADMIN.name());
 
 		http.formLogin()
 			.loginPage("/user/login")
@@ -73,7 +84,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.exceptionHandling()
 			.accessDeniedPage("/error/denied");
 
+		http.oauth2Login()
+			.defaultSuccessUrl("/")
+			.successHandler(oAuthAuthenticationSuccessHandler)
+			.userInfoEndpoint().userService(customOAuth2UserService);
+
+		http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
 		super.configure(http);
+
 	}
 
 	@Override
@@ -83,5 +102,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 		super.configure(auth);
 	}
+
 
 }

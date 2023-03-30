@@ -19,11 +19,13 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @Transactional
 @RequiredArgsConstructor
 @Service
@@ -54,6 +56,8 @@ public class PostServiceImpl implements PostService {
 		for (MultipartFile file : parameter.getFiles()) {
 			fileService.saveFile(file, post.getPostId());
 		}
+
+		log.info("Post added ! -> " + post.getPostId() );
 		return true;
 	}
 
@@ -128,6 +132,7 @@ public class PostServiceImpl implements PostService {
 	public boolean delete(Long postId) {
 		postRepository.deleteById(postId);
 		fileService.deleteByPostId(postId);
+		log.info("Post deletion complete! -> " + postId);
 		return true;
 	}
 
@@ -155,6 +160,7 @@ public class PostServiceImpl implements PostService {
 			fileService.saveFile(file, post.getPostId());
 		}
 
+		log.info("Post updated ! -> " + post.getPostId());
 		return true;
 	}
 
